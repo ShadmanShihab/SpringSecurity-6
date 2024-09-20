@@ -20,7 +20,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class ProdSecurityConfig {
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
+        http.sessionManagement(smc -> smc.invalidSessionUrl("/invalidSession"))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards").authenticated()
                 .requestMatchers("/notices", "/contact", "/error", "/register", "/login").permitAll());
