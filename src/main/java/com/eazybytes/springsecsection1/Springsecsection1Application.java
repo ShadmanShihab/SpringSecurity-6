@@ -7,8 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Springsecsection1Application {
 
 	public static void main(String[] args) {
-		System.out.println("Application started");
 		SpringApplication.run(Springsecsection1Application.class, args);
+		System.out.println("===================");
+		System.out.println("Application started");
+		System.out.println("===================");
 	}
 
 }
