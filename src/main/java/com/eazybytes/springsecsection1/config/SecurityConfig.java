@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
               .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
 
-              .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // Only HTTP
+              .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // Only HTTP insteam of https
               .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/user").authenticated()
                 .requestMatchers("/notices", "/contact", "/error", "/register", "/invalidSession").permitAll());
