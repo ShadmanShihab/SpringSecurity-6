@@ -56,7 +56,8 @@ public class SecurityConfig {
 
               .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure()) // Only HTTP insteam of https
               .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/user").authenticated()
+                .requestMatchers("/myBalance").hasAuthority("VIEWBALANCE")
+                .requestMatchers("/myAccount", "/myLoans", "/myCards", "/user").authenticated()
                 .requestMatchers("/notices", "/contact", "/error", "/register", "/invalidSession").permitAll());
             http.formLogin(withDefaults());
             http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));

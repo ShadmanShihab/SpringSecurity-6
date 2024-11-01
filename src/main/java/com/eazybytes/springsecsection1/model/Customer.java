@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "customer")
@@ -16,10 +17,12 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "customer_id")
     private long id;
 
+    private String name;
     private String email;
+    private String mobileNumber;
 
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -27,6 +30,11 @@ public class Customer {
 
     private String role;
 
-//    @JsonIgnore
-//    private Date createDt;
+    @Column(name = "create_dt")
+    @JsonIgnore
+    private Date createDt;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER)
+    private Set<Authority> authorities;
 }
