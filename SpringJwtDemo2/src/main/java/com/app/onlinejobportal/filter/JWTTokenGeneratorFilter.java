@@ -1,6 +1,6 @@
-package com.eazybytes.springsecsection1.filter;
+package com.app.onlinejobportal.filter;
 
-import com.eazybytes.springsecsection1.constants.ApplicationConstants;
+import com.app.onlinejobportal.ApplicationConstants;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
@@ -16,45 +16,39 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.stream.Collectors;
 
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
-  /**
-   * @param request
-   * @param response
-   * @param filterChain
-   * @throws ServletException
-   * @throws IOException
-   */
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                   FilterChain filterChain) throws ServletException, IOException {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (null != authentication) {
+    if (authentication != null) {
       Environment env = getEnvironment();
-      if (null != env) {
-        String secret = env.getProperty(ApplicationConstants.JWT_SECRET,
-          ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
+      if (env != null) {
+        String secret = env.getProperty(ApplicationConstants.JWT_SECRET, ApplicationConstants.JWT_SECRET_DEFAULT_VALUE);
         SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        String jwt = Jwts.builder().issuer("Eazy Bank").subject("JWT Token")
+        String jwtToken = Jwts.builder().issuer(ApplicationConstants.JWT_SECRET).subject("JWT TOKEN")
           .claim("username", authentication.getName())
-          .claim("authorities", authentication.getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .collect(Collectors.joining(",")))
-          .issuedAt(new Date())
-          .expiration(new Date((new Date()).getTime() + 30000000))
-          .signWith(secretKey).compact();
-        response.setHeader(ApplicationConstants.JWT_HEADER, jwt);
+          .claim("authorities", authentication.getAuthorities().stream()
+            .map(authority -> "ROLE_" + authority.getAuthority())
+            .collect(Collectors.joining(","))
+          )
+          .issuedAt(Date.from(Instant.now()))
+          .expiration(Date.from(Instant.now().plusMillis(30000000)))
+          .signWith(secretKey)
+          .compact();
+
+        response.addHeader("Authorization", jwtToken);
       }
     }
     filterChain.doFilter(request, response);
   }
 
   @Override
-  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-    return !request.getServletPath().equals("/user");
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+    return !request.getServletPath().equals("/login");
   }
-
 }
